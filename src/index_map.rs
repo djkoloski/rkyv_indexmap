@@ -1,14 +1,16 @@
 //! Archived index map implementation.
 
 use core::{borrow::Borrow, hash::Hash, iter::FusedIterator, marker::PhantomData};
+// TODO: remove this when scratch space serializers get added
+use alloc::vec::Vec;
 use rkyv::{
     collections::hash_index::{ArchivedHashIndex, HashBuilder, HashIndexResolver},
     out_field,
     ser::Serializer,
     Archive, Archived, RelPtr, Serialize,
 };
-// TODO: remove this when scratch space serializers get added
-use alloc::vec::Vec;
+#[cfg(feature = "indexmap")]
+use indexmap::IndexMap;
 
 #[cfg_attr(feature = "strict", repr(C))]
 struct Entry<K, V> {

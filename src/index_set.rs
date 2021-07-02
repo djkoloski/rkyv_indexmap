@@ -3,6 +3,8 @@
 use crate::index_map::{ArchivedIndexMap, IndexMapResolver, Keys};
 use core::{borrow::Borrow, hash::Hash};
 use rkyv::{collections::hash_index::HashBuilder, out_field, ser::Serializer, Serialize};
+#[cfg(feature = "indexmap")]
+use indexmap::IndexSet;
 
 /// An archived `IndexSet`.
 #[repr(transparent)]
@@ -132,6 +134,19 @@ impl<K> ArchivedIndexSet<K> {
         Ok(IndexSetResolver(
             ArchivedIndexMap::serialize_from_iter_index(iter.map(|k| (k, &())), index, serializer)?,
         ))
+    }
+}
+
+impl<K: PartialEq> PartialEq for ArchivedIndexSet<K> {
+    fn eq(&self, other: &Self) -> bool {
+        self.iter().eq(other.iter())
+    }
+}
+
+#[cfg(feature = "indexmap")]
+impl<UK, K: PartialEq<UK>> PartialEq<IndexSet<UK>> for ArchivedIndexSet<K> {
+    fn eq(&self, other: &IndexSet<UK>) -> bool {
+        self.iter().eq(other.iter())
     }
 }
 
